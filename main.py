@@ -3,8 +3,8 @@ import time
 
 def main():
     # 目标 IP 地址和端口
-    target_ip = '192.168.1.10'
-    target_port = 12345
+    target_ip = '192.168.1.106'
+    target_port = 1234
 
     # 创建 UDP 套接字
     sock = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
