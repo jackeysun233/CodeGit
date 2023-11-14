@@ -6,4 +6,8 @@ FPGA 		ip地址：10.10.18.105
 Rasberpi  	ip地址：10.10.18.106
 
 交换机		admin admin
-树莓派		hit	12231223
+树莓派		hit	12231223   串口设备地址/dev/ttyAMA1
+
+串口连接方式
+
+连接FPGA J19 外侧第8位（A12）和 树莓派 外侧 倒数第7位（GPIO1）
