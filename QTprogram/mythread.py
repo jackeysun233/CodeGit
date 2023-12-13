@@ -1,13 +1,13 @@
 from threading import Thread, current_thread
 import threading
-import SocketEntity
-import uart
+
+
 import time
 import pyqtgraph as pg
 from comm import sendUdp
 
 def target01():
-    print("这里是{}".format(current_thread().name))
+    print('1111')
     # 初始化变量和程序
     count = 0
     ber = 0

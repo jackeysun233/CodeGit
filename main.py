@@ -1,5 +1,6 @@
 import socket
 import time
+import random
 
 def main():
     # 目标 IP 地址和端口
@@ -33,6 +34,8 @@ def main():
     finally:
         # 关闭套接字
         sock.close()
+
+    
 
 # 调用 main() 函数
 if __name__ == '__main__':

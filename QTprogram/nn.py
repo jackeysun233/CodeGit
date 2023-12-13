@@ -8,13 +8,53 @@
 import sys
 import time
 from threading import Thread
-import mythread
 from PyQt5 import QtCore, QtGui, QtWidgets
 import pyqtgraph as pg
 from PyQt5.QtWidgets import QDialog, QVBoxLayout, QLabel, QPushButton
-
-import mythread
 from comm import sendUdp
+
+from threading import Thread, current_thread
+import threading
+
+
+import time
+import pyqtgraph as pg
+from comm import sendUdp
+
+stop_flag = False
+count = 0
+ber = 0
+
+def target01():
+    print('1111')
+    # 初始化变量和程序
+    global stop_flag, count, ber
+    add_ber = 0
+    # 设置服务器默认端口号
+    RECPORT = 1235
+    SENDPORT = 1234
+
+    SENDIP = "10.18.18.105"
+
+    # 发送信息应包含以下
+    msg = ""
+    num = 256
+    for i in range(0, 256):
+        msg = msg + "F"
+    msg1 = bytes.fromhex(msg)
+
+    # 开启循环发送数据
+    while True:
+        value_stop_flag = stop_flag
+        if value_stop_flag:
+            break
+        count += 1
+        print(i)
+        bit_err_rate = sendUdp(SENDIP, SENDPORT, RECPORT, msg1)
+        # 更新误码率
+        add_ber = bit_err_rate + add_ber
+        ber = add_ber / count
+        print('当前误码率为： ', ber)
 
 
 class Ui_Dialog(object):
@@ -46,8 +86,8 @@ class Ui_Dialog(object):
         self.retranslateUi(Dialog)
         QtCore.QMetaObject.connectSlotsByName(Dialog)
 
-        self.thread01 = Thread(target=mythread.target01, args="参数1", name="线程1")
-        # self.thread01 = Thread(target=mythread.target01)
+        # self.thread01 = Thread(target=mythread.target01, args="参数1", name="线程1")
+        self.thread01 = Thread(target=target01)
         # self.thread02 = Thread(target=mythread.target02)
 
     def retranslateUi(self, Dialog):
@@ -60,10 +100,13 @@ class Ui_Dialog(object):
 
     def btn3_click(self):
         try:
-
+            global stop_flag, count, ber
+            stop_flag = False
             self.thread01.start()  # 启动线程
-            ui.textEdit.setPlainText(mythread.count_str)
-            ui.textEdit_2.setPlainText(mythread.ber_str)
+            count_str = str(count)
+            ber_str = str(ber)
+            ui.textEdit.setPlainText(count_str)
+            ui.textEdit_2.setPlainText(ber_str)
             self.timer_start() # 启动时间间隔
 
         except RuntimeError as e:
@@ -86,21 +129,27 @@ class Ui_Dialog(object):
     def updataData(self):
         # ui.textEdit.setPlainText(str(111))
         # ui.textEdit_2.setPlainText(str(222))
-        ui.textEdit.setPlainText(mythread.count_str)
-        print("接受次数：", mythread.count_str)
-        ui.textEdit_2.setPlainText(mythread.ber_str)
+        global count,ber
+        count_str = str(count)
+        ber_str = str(ber)
+        ui.textEdit.setPlainText(count_str)
+        print("接受次数：", count_str)
+        ui.textEdit_2.setPlainText(ber_str)
+
 
     #杀死线程
     def btn4_click(self):  # 新增的停止按钮点击事件处理函数
-        self.timer.stop()  # 停止定时器
-        mythread.stop_flag = True  # 设置停止标志为True
-        self.thread01.join()  # 等待线程1结束
+        global stop_flag
+        # self.timer.stop()  # 停止定时器
+        stop_flag = True  # 设置停止标志为True
         # self.thread02.join()  # 等待线程2结束
         print("Threads stopped")
         sys.exit(0)  # 通过sys.exit()来退出程序
         MainWindow.close()  # 手动关闭主窗口
     def stop_threads(self):
-        mythread.stop_flag = True  # 设置停止标志为True
+        global stop_flag
+        stop_flag=True
+        stop_flag = True  # 设置停止标志为True
         self.thread01.join()  # 等待线程1结束
         # self.thread02.join()  # 等待线程2结束
 class MyPopupWindow(QDialog):
