@@ -4,45 +4,53 @@ import SocketEntity
 import uart
 import time
 import pyqtgraph as pg
-countnum = 0
-error_data = 0
-
+from comm import sendUdp
 
 def target01():
     print("这里是{}".format(current_thread().name))
-    global countnum
-    countnum = 0
+    # 初始化变量和程序
+    count = 0
+    ber = 0
+    add_ber = 0
+    # 设置服务器默认端口号
+    RECPORT = 1235
+    SENDPORT = 1234
+
+    SENDIP = "10.18.18.105"
+
+    # 发送信息应包含以下
+    msg = ""
+    num = 256
+    for i in range(0, 256):
+        msg = msg + "F"
+    msg1 = bytes.fromhex(msg)
+
+    # 开启循环发送数据
     while True:
-        recvdata = None
-        recvdata = SocketEntity.myudp()
-        print(recvdata)
-        if recvdata is not None:
-            countnum += 1
-            print("======================", recvdata,countnum)
-        time.sleep(1)
+        count += 1
+        bit_err_rate = sendUdp(SENDIP, SENDPORT, RECPORT, msg1)
+        # 更新误码率
+        add_ber = bit_err_rate + add_ber
+        ber = add_ber / count
+        print('当前误码率为： ', ber)
+        count_str = '{:.0f}'.format(count)
+        ber_str = '{:.2%}'.format(ber)
 
 
-def target02():
-    print("这里是{}".format(current_thread().name))
-    while True:
-        global error_data
-        error_data = uart.myuart("/dev/ttyAMA1", 115200)
-        print(error_data)
-        time.sleep(1)
 
 
 def stop():
     flag = False
-stop_flag = False
+    stop_flag = False
 
 
 
 if __name__ == '__main__':
     # 创建线程
     thread01 = Thread(target=target01)
-    thread02 = Thread(target=target02)
+
 
     # 启动线程
     thread01.start()
-    thread02.start()
+
     # 线程退出
