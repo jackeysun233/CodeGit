@@ -19,8 +19,8 @@ def generate_random_binary_sequence(length, probability):
         hex_sequence.append(hex_digit)
 
 
-    hex_res = str(hex_sequence)
-    return hex_res
+    hex_list = str(hex_sequence)
+    return hex_list
 
 if __name__ == "__main__":
     hex_input = "1A3F"  # 你可以替换成你想要转换的16进制数
